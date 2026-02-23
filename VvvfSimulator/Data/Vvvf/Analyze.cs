@@ -58,6 +58,25 @@ namespace VvvfSimulator.Data.Vvvf
         }
         private static double GetAmplitude(AmplitudeValue.Parameter Param, double Current)
         {
+            if (Param.Mode == AmplitudeValue.Parameter.ValueMode.Table)
+            {
+                int TargetIndex = 0;
+                for (int i = 0; i < Param.AmplitudeTable.Length; i++)
+                {
+                    if (Param.AmplitudeTable[i].Frequency > Current) break;
+                    TargetIndex = i;
+                }
+
+                if (Param.AmplitudeTableInterpolation && (TargetIndex + 1 < Param.AmplitudeTable.Length))
+                {
+                    (double FrequencyStart, double AmplitudeStart) = Param.AmplitudeTable[TargetIndex];
+                    (double FrequencyEnd, double AmplitudeEnd) = Param.AmplitudeTable[TargetIndex + 1];
+                    return (AmplitudeEnd - AmplitudeStart) / (FrequencyEnd - FrequencyStart) * (Current - FrequencyStart) + AmplitudeStart;
+                }
+                else
+                    return Param.AmplitudeTable[TargetIndex].Amplitude;
+            }
+
             double Amplitude = 0;
 
             if (Param.EndAmplitude == Param.StartAmplitude) Amplitude = Param.StartAmplitude;
@@ -117,26 +136,6 @@ namespace VvvfSimulator.Data.Vvvf
                 double x = Math.PI * Current / (2.0 * Param.EndFrequency);
 
                 Amplitude = Math.Sin(x) * Param.EndAmplitude;
-            }
-            else if (Param.Mode == AmplitudeValue.Parameter.ValueMode.Table)
-            {
-                int TargetIndex = 0;
-                for (int i = 0; i < Param.AmplitudeTable.Length; i++)
-                {
-                    if (Param.AmplitudeTable[i].Frequency > Current) break;
-                    TargetIndex = i;
-                }
-
-                if (Param.AmplitudeTableInterpolation && (TargetIndex + 1 < Param.AmplitudeTable.Length))
-                {
-                    (double FrequencyStart, double AmplitudeStart) = Param.AmplitudeTable[TargetIndex];
-                    (double FrequencyEnd, double AmplitudeEnd) = Param.AmplitudeTable[TargetIndex + 1];
-                    Amplitude = (AmplitudeEnd - AmplitudeStart) / (FrequencyEnd - FrequencyStart) * (Current - FrequencyStart) + AmplitudeStart;
-                }
-                else
-                {
-                    Amplitude = Param.AmplitudeTable[TargetIndex].Amplitude;
-                }
             }
 
             if (Param.CutOffAmplitude > Amplitude) Amplitude = 0;

@@ -51,7 +51,7 @@ namespace VvvfSimulator.Vvvf.Calculation
                 int _GetPwm(double t)
                 {
                     double a = (double)(M_PI_2 - Domain.ElectricalState.BaseWaveAmplitude);
-                    double b = Common.GetPulseDataValue(Domain.ElectricalState.PulseData, PulseDataKey.PulseWidth);
+                    double b = Common.GetPulseDataValue(Domain.ElectricalState.PulseData, PulseDataKey.PulseWidth) / 180 * M_PI;
                     if (t < a) return 1;
                     if (t < a + b) return 2;
                     if (t < a + 2 * b) return 1;
@@ -65,6 +65,34 @@ namespace VvvfSimulator.Vvvf.Calculation
                     2 => 2 - _GetPwm(Quater),
                     _ => 2 - _GetPwm(M_PI_2 - Quater)
                 };
+            }
+
+            if (Domain.ElectricalState.PulsePattern.PulseMode.PulseCount == 5 && Domain.ElectricalState.PulsePattern.PulseMode.Alternative == PulseAlternative.Alt2)
+            {
+                double SineVal = (double)Domain.ElectricalState.BaseWaveAmplitude * Functions.Sine(RawX);
+                double beta = Common.GetPulseDataValue(Domain.ElectricalState.PulseData, PulseDataKey.PulseWidth) / 180 * M_PI;
+                double x = RawX % M_2PI;
+                int Orthant = (int)(x / M_PI_2) % 4;
+
+                double _GetCarrier(double x, double beta)
+                {
+                    if (0 <= x && x < beta)
+                        return -(1 / beta) * x + 1;
+                    else if (beta <= x && x < M_PI_2)
+                        return -1 / (M_PI_2 - beta) * (x - M_PI_2);
+                    else
+                        return 0;
+                }
+
+                double SawVal = Orthant switch
+                {
+                    0 => _GetCarrier(x, beta),
+                    1 => _GetCarrier(M_PI - x, beta),
+                    2 => -_GetCarrier(x - M_PI, beta),
+                    _ => -_GetCarrier(M_2PI - x, beta)
+                };
+
+                return Orthant <= 1 ? Common.ModulateSignal(SineVal, SawVal) + 1 : -Common.ModulateSignal(SawVal, SineVal) + 1;
             }
 
             { // nP DEFAULT

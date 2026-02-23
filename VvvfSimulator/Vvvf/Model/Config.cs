@@ -73,7 +73,7 @@ namespace VvvfSimulator.Vvvf.Model
                     return PulseCount switch
                     {
                         1 => [PulseAlternative.Default, PulseAlternative.Alt1],
-                        5 => [PulseAlternative.Default, PulseAlternative.Alt1],
+                        5 => AlternativesDefaultToX(2, []),
                         _ => [PulseAlternative.Default],
                     };
                 }
@@ -294,6 +294,7 @@ namespace VvvfSimulator.Vvvf.Model
                 {
                     if (PulseMode.PulseCount == 1 && PulseMode.Alternative == PulseAlternative.Alt1) return false;
                     if (PulseMode.PulseCount == 5 && PulseMode.Alternative == PulseAlternative.Alt1) return false;
+                    if (PulseMode.PulseCount == 5 && PulseMode.Alternative == PulseAlternative.Alt2) return false;
 
                 }
                 return true;
@@ -347,6 +348,7 @@ namespace VvvfSimulator.Vvvf.Model
                         5 => PulseMode.Alternative switch
                         {
                             PulseAlternative.Alt1 => [PulseDataKey.PulseWidth],
+                            PulseAlternative.Alt2 => [PulseDataKey.PulseWidth],
                             _ => [PulseDataKey.Dipolar],
                         },
                         _ => [PulseDataKey.Dipolar]

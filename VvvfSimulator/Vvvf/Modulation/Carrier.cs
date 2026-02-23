@@ -197,7 +197,6 @@ namespace VvvfSimulator.Vvvf.Modulation
                 {
                     LastTime = Time - (Time - LastTime) * (LastInterval == 0 ? 1 : Parameter.Interval / LastInterval);
                     LastInterval = Parameter.Interval;
-                    LastTime = Time;
                 }
 
                 if (Time - LastTime >= Parameter.Interval)
