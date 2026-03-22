@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static VvvfSimulator.Data.Util;
@@ -233,7 +233,7 @@ namespace VvvfSimulator.Data.Vvvf
 
                     public enum PulseHarmonicType
                     {
-                        Sine, Saw, Square
+                    Sine, Triangle, Square, HFI, HFISine, HFITriangle
                     }
                 }
 
