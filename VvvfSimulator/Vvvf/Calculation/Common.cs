@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using static VvvfSimulator.Data.Vvvf.Struct.PulseControl.Pulse;
 using static VvvfSimulator.Vvvf.Model.Struct;
@@ -174,13 +174,28 @@ namespace VvvfSimulator.Vvvf.Calculation
                     double HarmonicX = HarmonicData.IsHarmonicProportional switch
                     {
                         true => HarmonicData.Harmonic * (X + HarmonicData.InitialPhase),
-                        false => M_2PI * HarmonicData.Harmonic * (Control.GetTime() + InitialPhase)
+                        false => M_2PI * HarmonicData.Harmonic * Control.GetTime() + M_2PI_3 * Phase + HarmonicData.InitialPhase + InitialPhase
                     };
                     HarmonicWave += (double)(HarmonicData.Type switch
                     {
                         PulseHarmonic.PulseHarmonicType.Sine => Sine(HarmonicX),
-                        PulseHarmonic.PulseHarmonicType.Saw => Triangle(HarmonicX),
+                        PulseHarmonic.PulseHarmonicType.Triangle => Triangle(HarmonicX),
                         PulseHarmonic.PulseHarmonicType.Square => Square(HarmonicX),
+                        PulseHarmonic.PulseHarmonicType.HFI => Sine(X) * (HarmonicData.IsHarmonicProportional switch
+                        {
+                        true => Square((Control.GetCarrierInstance().Phase + M_PI_2) / HarmonicData.Harmonic + HarmonicData.InitialPhase),
+                        false => Square(M_2PI * HarmonicData.Harmonic * Control.GetTime() + M_PI_2 * (HarmonicData.Harmonic / Control.GetCarrierInstance().Frequency) + HarmonicData.InitialPhase),
+                        }),
+                        PulseHarmonic.PulseHarmonicType.HFISine => Sine(X) * (HarmonicData.IsHarmonicProportional switch
+                        {
+                        true => Sine((Control.GetCarrierInstance().Phase + M_PI_2) / HarmonicData.Harmonic + HarmonicData.InitialPhase),
+                        false => Sine(M_2PI * HarmonicData.Harmonic * Control.GetTime() + M_PI_2 * (HarmonicData.Harmonic / Control.GetCarrierInstance().Frequency) + HarmonicData.InitialPhase),
+                        }),
+                        PulseHarmonic.PulseHarmonicType.HFITriangle => Sine(X) * (HarmonicData.IsHarmonicProportional switch
+                        {
+                        true => Triangle((Control.GetCarrierInstance().Phase + M_PI_2) / HarmonicData.Harmonic + HarmonicData.InitialPhase),
+                        false => Triangle(M_2PI * HarmonicData.Harmonic * Control.GetTime() + M_PI_2 * (HarmonicData.Harmonic / Control.GetCarrierInstance().Frequency) + HarmonicData.InitialPhase),
+                        }),
                         _ => 0,
                     } * HarmonicData.Amplitude * (HarmonicData.IsAmplitudeProportional ? Control.ElectricalState.BaseWaveAmplitude : 1));
                 }
