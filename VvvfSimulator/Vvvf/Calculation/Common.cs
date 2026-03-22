@@ -174,7 +174,7 @@ namespace VvvfSimulator.Vvvf.Calculation
                     double HarmonicX = HarmonicData.IsHarmonicProportional switch
                     {
                         true => HarmonicData.Harmonic * (X + HarmonicData.InitialPhase),
-                        false => M_2PI * HarmonicData.Harmonic * (Control.GetTime() + InitialPhase)
+                        false => M_2PI * HarmonicData.Harmonic * Control.GetTime() + M_2PI_3 * Phase + HarmonicData.InitialPhase + InitialPhase
                     };
                     HarmonicWave += (double)(HarmonicData.Type switch
                     {
