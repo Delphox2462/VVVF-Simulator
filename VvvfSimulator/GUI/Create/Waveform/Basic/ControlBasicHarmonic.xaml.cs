@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,7 +25,7 @@ namespace VvvfSimulator.GUI.Create.Waveform.Basic
         //Harmonic Presets
         public enum PresetHarmonics
         {
-            THI, HFI, SquareFourier
+            THI, HFI, RHFI, SquareFourier
         }
 
         public static List<PulseHarmonic> GetPresetHarmonics(PresetHarmonics harmonic)
@@ -33,12 +33,16 @@ namespace VvvfSimulator.GUI.Create.Waveform.Basic
             switch (harmonic)
             {
                 case PresetHarmonics.THI:
-                    return [ 
-                        new() { Amplitude = 0.2, Harmonic = 3 } 
+                    return [
+                        new() { Amplitude = 0.2, Harmonic = 3 }
                     ];
                 case PresetHarmonics.HFI:
                     return [
-                        new () { Amplitude = 0.5, Harmonic = 250, IsAmplitudeProportional=false, IsHarmonicProportional = false}
+                        new () { Amplitude = 0.25, Harmonic = 250, Type = PulseHarmonic.PulseHarmonicType.HFI, IsHarmonicProportional = false, IsAmplitudeProportional = false}
+                    ];
+                case PresetHarmonics.RHFI:
+                    return [
+                        new () { Amplitude = 0.25, Harmonic = 1, Type = PulseHarmonic.PulseHarmonicType.HFI, IsHarmonicProportional = true, IsAmplitudeProportional = false}
                     ];
                 default:
                     List<PulseHarmonic> harmonics = [];
